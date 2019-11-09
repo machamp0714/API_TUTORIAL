@@ -1,0 +1,4 @@
+docker-compose run -rm server bundle exec rails new . --force --database=mysql --skip-bundle --skip-test --api
+docker-compose build
+docker-compose up
+docker-compose run -rm server rails db:create db:migrate
