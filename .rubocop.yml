@@ -1,0 +1,7 @@
+AllCops:
+  TargetRubyVersion: 2.6.5
+  Include:
+    - rubocop-rails
+
+Metrics/LineLength:
+  Enabled: false
