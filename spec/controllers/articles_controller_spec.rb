@@ -4,17 +4,17 @@ require 'rails_helper'
 
 RSpec.describe ArticlesController, type: :controller do
   describe '#index' do
+    subject { get :index }
+
     it 'index should return success response' do
-      get :index
+      subject
       expect(response).to have_http_status :ok
     end
 
     it 'index should return json data' do
       articles = create_list :article, 2
 
-      get :index
-      json = JSON.parse(response.body)
-      json_data = json['data']
+      subject
 
       articles.each_with_index do |article, index|
         expect(json_data[index]['attributes']).to eq(
