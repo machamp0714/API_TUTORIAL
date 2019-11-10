@@ -12,17 +12,26 @@ RSpec.describe ArticlesController, type: :controller do
     end
 
     it 'index should return json data' do
-      articles = create_list :article, 2
+      create_list :article, 2
 
       subject
 
-      articles.each_with_index do |article, index|
+      Article.recent.each_with_index do |article, index|
         expect(json_data[index]['attributes']).to eq(
           'title' => article.title,
           'content' => article.content,
           'slug' => article.slug
         )
       end
+    end
+
+    it 'returns a article list in order by' do
+      old_article = create :article
+      new_article = create :article
+      subject
+
+      expect(json_data.first['id']).to eq new_article.id.to_s
+      expect(json_data.last['id']).to eq old_article.id.to_s
     end
   end
 end
