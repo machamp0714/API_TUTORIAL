@@ -21,6 +21,7 @@ gem 'puma', '~> 3.11'
 # Use Active Storage variant
 # gem 'image_processing', '~> 1.2'
 gem 'active_model_serializers'
+gem 'kaminari'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem 'bootsnap', '>= 1.4.2', require: false
