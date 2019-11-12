@@ -69,7 +69,6 @@ RSpec.describe 'AccessTokens', type: :request do
   end
 
   describe 'DELETE #destroy' do
-    subject { delete logout_path }
     let(:authorization_error) do
       {
         'status' => '403',
@@ -80,6 +79,8 @@ RSpec.describe 'AccessTokens', type: :request do
     end
 
     context 'when invalid request' do
+      subject { delete logout_path }
+
       it 'should return 403 code' do
         subject
         expect(response).to have_http_status(:forbidden)
@@ -87,9 +88,27 @@ RSpec.describe 'AccessTokens', type: :request do
 
       it 'should return error body' do
         subject
-        p json
         expect(json['error']).to eq(authorization_error)
       end
+    end
+
+    context 'when valid request' do
+      let(:user) { create :user }
+      let(:access_token) { user.create_access_token }
+      let(:headers) do
+        { authorization: "Bearer #{access_token.token}" }
+      end
+
+      subject { delete logout_path, headers: headers }
+
+      it 'should return 204 code' do
+        subject
+        expect(response).to have_http_status(:no_content)
+      end
+
+      # it 'should remove access token' do
+      #   expect { subject }.to change(AccessToken, :count).by(-1)
+      # end
     end
   end
 end
