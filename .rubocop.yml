@@ -9,3 +9,7 @@ Style/AsciiComments:
   Enabled: false
 Style/Documentation:
   Enabled: false
+Layout/EndAlignment:
+  Enabled: false
+Layout/IndentationWidth:
+  Enabled: false
