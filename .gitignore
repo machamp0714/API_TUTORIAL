@@ -23,3 +23,6 @@
 
 # Ignore mysql data
 mysql-data
+
+# Ignore env file
+.docker-env
