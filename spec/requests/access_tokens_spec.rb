@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'AccessTokens', type: :request do
   describe '#create' do
     context 'when invalid request' do
-      let(:error) do
+      let(:authorization_error) do
         {
           'status' => '401',
           'source' => { 'pointer' => '/code' },
@@ -17,13 +17,13 @@ RSpec.describe 'AccessTokens', type: :request do
       it 'when not code provided' do
         post login_path
         expect(response).to have_http_status 401
-        expect(json['errors']).to include error
+        expect(json['errors']).to include authorization_error
       end
 
       it 'when code is invalid' do
         post login_path, params: { code: 'invalid_code' }
         expect(response).to have_http_status 401
-        expect(json['errors']).to include error
+        expect(json['errors']).to include(authorization_error)
       end
     end
 
@@ -64,6 +64,31 @@ RSpec.describe 'AccessTokens', type: :request do
         subject
 
         expect(json_data['attributes']['token']).to eq(user.access_token.token)
+      end
+    end
+  end
+
+  describe 'DELETE #destroy' do
+    subject { delete logout_path }
+    let(:authorization_error) do
+      {
+        'status' => '403',
+        'source' => { 'pointer' => '/headers/authorization' },
+        'title' => 'Not authorized',
+        'detail' => 'You have no right to access this resource.'
+      }
+    end
+
+    context 'when invalid request' do
+      it 'should return 403 code' do
+        subject
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'should return error body' do
+        subject
+        p json
+        expect(json['error']).to eq(authorization_error)
       end
     end
   end

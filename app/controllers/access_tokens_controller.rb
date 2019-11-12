@@ -10,6 +10,16 @@ class AccessTokensController < ApplicationController
     render json: authenticator.access_token, status: :created
   end
 
+  def destroy
+    error = {
+      'status' => '403',
+      'source' => { 'pointer' => '/headers/authorization' },
+      'title' => 'Not authorized',
+      'detail' => 'You have no right to access this resource.'
+    }
+    render json: { error: error }, status: :forbidden
+  end
+
   private
 
   def authentication_error
