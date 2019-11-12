@@ -10,6 +10,13 @@ class AccessToken < ApplicationRecord
 
   def generate_token
     # 一意な文字列を生成するにはどうすれば良いか。
-    self.token = SecureRandom.hex(10)
+    loop do
+      # tokenは一度だけ生成する
+      # tokenが存在する場合、tokenを生成しない
+      # tokenが一意である時、tokenを生成しない
+      break if token.present? && !AccessToken.where.not(id: id).exists?(token: token)
+
+      self.token = SecureRandom.hex(10)
+    end
   end
 end
