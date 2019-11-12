@@ -4,7 +4,6 @@ require 'rails_helper'
 
 RSpec.describe 'AccessTokens', type: :request do
   describe '#create' do
-    subject { post login_path }
     context 'when invalid request' do
       let(:error) do
         {
@@ -15,21 +14,16 @@ RSpec.describe 'AccessTokens', type: :request do
         }
       end
 
-      it 'should return 401 code' do
-        subject
+      it 'when not code provided' do
+        post login_path
         expect(response).to have_http_status 401
-      end
-
-      it 'should return error body' do
-        subject
         expect(json['errors']).to include error
       end
-    end
 
-    context 'when valid request' do
-      it 'should return 201 code' do
-        post login_path
-        expect(response).to have_http_status 201
+      it 'when code is invalid' do
+        post login_path, params: { code: 'invalid_code' }
+        expect(response).to have_http_status 401
+        expect(json['errors']).to include error
       end
     end
   end
