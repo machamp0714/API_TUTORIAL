@@ -13,3 +13,7 @@ Layout/EndAlignment:
   Enabled: false
 Layout/IndentationWidth:
   Enabled: false
+Layout/ElseAlignment:
+  Enabled: false
+Metrics/AbcSize:
+  Enabled: false
