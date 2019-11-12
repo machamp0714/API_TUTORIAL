@@ -33,6 +33,7 @@ describe UserAuthenticator do
       end
 
       before do
+        # allow_any_instance_ofの挙動について理解する
         allow_any_instance_of(Octokit::Client).to receive(
           :exchange_code_for_token
         ).and_return('validaccesstoken')
@@ -51,6 +52,11 @@ describe UserAuthenticator do
         user = create :user, user_data
         expect { subject }.not_to change { User.count }
         expect(authenticator.user).to eq(user)
+      end
+
+      it 'should create access token and set token' do
+        expect { subject }.to change { AccessToken.count }.by(1)
+        expect(authenticator.access_token).to be_present
       end
     end
   end
