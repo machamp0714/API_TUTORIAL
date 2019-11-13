@@ -42,4 +42,26 @@ RSpec.describe ArticlesController, type: :controller do
       expect(json_data.first['id']).to eq Article.recent.second.id.to_s
     end
   end
+
+  describe 'GET #show' do
+    let(:article) { create :article }
+    let(:article_data) do
+      {
+        'title' => article.title,
+        'content' => article.content,
+        'slug' => article.slug
+      }
+    end
+    subject { get :show, params: { id: article.id } }
+
+    it 'should return 200 status code' do
+      subject
+      expect(response).to have_http_status :ok
+    end
+
+    it 'should return proper json' do
+      subject
+      expect(json_data['attributes']).to eq(article_data)
+    end
+  end
 end
