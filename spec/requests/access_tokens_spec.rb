@@ -13,7 +13,7 @@ RSpec.describe 'AccessTokens', type: :request do
           'detail' => 'You must provide valid code in order to exchange it for token.'
         }
       end
-      # shared_examplesでリファクタリングする
+
       it 'when not code provided' do
         post login_path
         expect(response).to have_http_status 401
@@ -69,27 +69,16 @@ RSpec.describe 'AccessTokens', type: :request do
   end
 
   describe 'DELETE #destroy' do
-    let(:authorization_error) do
-      {
-        'status' => '403',
-        'source' => { 'pointer' => '/headers/authorization' },
-        'title' => 'Not authorized',
-        'detail' => 'You have no right to access this resource.'
-      }
-    end
-
-    context 'when invalid request' do
+    context 'when no authorization header provided' do
       subject { delete logout_path }
 
-      it 'should return 403 code' do
-        subject
-        expect(response).to have_http_status(:forbidden)
-      end
+      it_behaves_like 'forbidden_request'
+    end
 
-      it 'should return error body' do
-        subject
-        expect(json['error']).to eq(authorization_error)
-      end
+    context 'when invalid authorization header provided' do
+      subject { delete logout_path, headers: { authorization: 'Invalid Token' } }
+
+      it_behaves_like 'forbidden_request'
     end
 
     context 'when valid request' do
@@ -105,10 +94,6 @@ RSpec.describe 'AccessTokens', type: :request do
         subject
         expect(response).to have_http_status(:no_content)
       end
-
-      # it 'should remove access token' do
-      #   expect { subject }.to change(AccessToken, :count).by(-1)
-      # end
     end
   end
 end
