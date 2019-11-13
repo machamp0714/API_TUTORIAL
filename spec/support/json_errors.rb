@@ -42,6 +42,6 @@ shared_examples_for 'forbidden_request' do
 
   it 'should return error body' do
     subject
-    expect(json['error']).to eq(authorization_error)
+    expect(json['errors']).to include(authorization_error)
   end
 end

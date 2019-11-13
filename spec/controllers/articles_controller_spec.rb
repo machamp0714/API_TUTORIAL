@@ -64,4 +64,51 @@ RSpec.describe ArticlesController, type: :controller do
       expect(json_data['attributes']).to eq(article_data)
     end
   end
+
+  describe 'POST #create' do
+    let(:invalid_attributes) do
+      {
+        data: {
+          attributes: {
+            title: '',
+            content: ''
+          }
+        }
+      }
+    end
+
+    subject { post :create, params: invalid_attributes }
+
+    context 'when no authorization headers provided' do
+      it_behaves_like 'forbidden_request'
+    end
+
+    context 'when invalid authorization provided' do
+      before { request.headers['authorization'] = 'Invalid token' }
+      it_behaves_like 'forbidden_request'
+    end
+
+    context 'when authorized' do
+      let(:user) { create :user }
+      let(:access_token) { user.create_access_token }
+      before { request.headers['authorization'] = "Bearer #{access_token.token}" }
+
+      context 'when invalid parameters provided' do
+        it 'should return 422 status code' do
+          subject
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'should return proper json' do
+          subject
+          expect(json['errors']).to include({
+            'status' => '422',
+            'source' => { 'pointer' => '/data/attributes/title' },
+            'title' => "can't be blank",
+            'detail' => 'The title you provided cannot be blank.'
+          })
+        end
+      end
+    end
+  end
 end

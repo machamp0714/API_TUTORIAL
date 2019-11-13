@@ -39,6 +39,6 @@ class ApplicationController < ActionController::API
       'title' => 'Not authorized',
       'detail' => 'You have no right to access this resource.'
     }
-    render json: { error: error }, status: :forbidden
+    render json: { 'errors': [error] }, status: :forbidden
   end
 end
