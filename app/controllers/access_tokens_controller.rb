@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AccessTokensController < ApplicationController
+  before_action :authorize!, only: :destroy
+
   def create
     authenticator = UserAuthenticator.new(params[:code])
     authenticator.perform
@@ -9,12 +11,6 @@ class AccessTokensController < ApplicationController
   end
 
   def destroy
-    provided_token = request.authorization&.gsub(/\ABearer\s/, '')
-    access_token = AccessToken.find_by(token: provided_token)
-    current_user = access_token&.user
-
-    raise AuthorizationError unless current_user
-
     current_user.access_token.delete
   end
 end

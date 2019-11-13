@@ -8,6 +8,19 @@ class ApplicationController < ActionController::API
 
   private
 
+  def authorize!
+    raise AuthorizationError unless current_user
+  end
+
+  def current_user
+    @current_user ||= access_token&.user
+  end
+
+  def access_token
+    provided_token = request.authorization&.gsub(/\ABearer\s/, '')
+    @access_token ||= AccessToken.find_by(token: provided_token)
+  end
+
   def authentication_error
     error = {
       'status' => '401',
