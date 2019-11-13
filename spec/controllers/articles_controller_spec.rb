@@ -101,12 +101,20 @@ RSpec.describe ArticlesController, type: :controller do
 
         it 'should return proper json' do
           subject
-          expect(json['errors']).to include({
-            'status' => '422',
-            'source' => { 'pointer' => '/data/attributes/title' },
-            'title' => "can't be blank",
-            'detail' => 'The title you provided cannot be blank.'
-          })
+          expect(json['errors']).to include(
+            {
+              "source" => { "pointer" => "/data/attributes/title" },
+              "detail" => "can't be blank"
+            },
+            {
+              "source" => { "pointer" => "/data/attributes/content" },
+              "detail" => "can't be blank"
+            },
+            {
+              "source" => { "pointer" => "/data/attributes/slug" },
+              "detail" => "can't be blank"
+            }
+          )
         end
       end
     end

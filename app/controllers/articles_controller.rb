@@ -15,16 +15,12 @@ class ArticlesController < ApplicationController
 
   def create
     article = Article.new(article_params)
-    if article.save
+    if article.valid?
       # create
     else
-      error = {
-        'status' => '422',
-        'source' => { 'pointer' => '/data/attributes/title' },
-        'title' => "can't be blank",
-        'detail' => 'The title you provided cannot be blank.'
-      }
-      render json: { errors: [error] }, status: :unprocessable_entity
+      render json: article, adapter: :json_api,
+             serializer: ActiveModel::Serializer::ErrorSerializer,
+             status: :unprocessable_entity
     end
   end
 
@@ -32,6 +28,7 @@ class ArticlesController < ApplicationController
 
   def article_params
     # requireメソッドは何を返すの？
-    params.require(:data).require(:attributes).permit(:title, :content, :slug)
+    # params.require(:data).require(:attributes).permit(:title, :content, :slug)
+    ActionController::Parameters.new
   end
 end

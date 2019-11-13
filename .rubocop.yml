@@ -21,3 +21,5 @@ Metrics/BlockLength:
   Enabled: false
 Lint/AmbiguousBlockAssociation:
   Enabled: false
+Style/StringLiterals:
+  Enabled: false
