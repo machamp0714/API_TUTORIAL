@@ -148,4 +148,61 @@ RSpec.describe ArticlesController, type: :controller do
       end
     end
   end
+
+  describe 'PATCH #update' do
+    let(:article) { create :article }
+    let(:invalid_attributes) do
+      {
+        'id' => article.id,
+        'data' => {
+          'attributes' => {
+            'title' => '',
+            'content' => '',
+            'slug' => ''
+          }
+        }
+      }
+    end
+    subject { patch :update, params: invalid_attributes }
+
+    context 'when no authorization headers provided' do
+      it_behaves_like 'forbidden_request'
+    end
+
+    context 'when invalid authorization provided' do
+      before { request.headers['authorization'] = 'invalid_token' }
+      it_behaves_like 'forbidden_request'
+    end
+
+    context 'when authorized' do
+      let(:user) { create :user }
+      let(:access_token) { user.create_access_token }
+      before { request.headers['authorization'] = "Bearer #{access_token.token}" }
+
+      context 'when invalid parameters provided' do
+        it 'should return 422 status code' do
+          subject
+          expect(response).to have_http_status :unprocessable_entity
+        end
+
+        it 'should return proper error json' do
+          subject
+          expect(json['errors']).to include(
+            {
+              "source" => { "pointer" => "/data/attributes/title" },
+              "detail" => "can't be blank"
+            },
+            {
+              "source" => { "pointer" => "/data/attributes/content" },
+              "detail" => "can't be blank"
+            },
+            {
+              "source" => { "pointer" => "/data/attributes/slug" },
+              "detail" => "can't be blank"
+            }
+          )
+        end
+      end
+    end
+  end
 end

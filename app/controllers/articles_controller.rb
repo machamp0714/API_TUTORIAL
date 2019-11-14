@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ArticlesController < ApplicationController
-  before_action :authorize!, only: [:create]
+  before_action :authorize!, only: %i[create update]
 
   def index
     articles = Article.recent.page(params[:page]).per(params[:per_page])
@@ -20,6 +20,16 @@ class ArticlesController < ApplicationController
     if article.save
       serializer = ArticleSerializer.new(article).serialized_json
       render json: serializer, status: :created
+    else
+      error = ErrorSerializer.new(article).serialized_json
+      render json: { errors: error }, status: :unprocessable_entity
+    end
+  end
+
+  def update
+    article = Article.find(params[:id])
+    if article.update(article_params)
+      # update
     else
       error = ErrorSerializer.new(article).serialized_json
       render json: { errors: error }, status: :unprocessable_entity
