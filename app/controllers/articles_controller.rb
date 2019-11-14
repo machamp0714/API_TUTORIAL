@@ -6,7 +6,7 @@ class ArticlesController < ApplicationController
   def index
     articles = Article.recent.page(params[:page]).per(params[:per_page])
     serializer = ArticleSerializer.new(articles).serialized_json
-    render json: serializer
+    render json: serializer, status: :ok
   end
 
   def show
@@ -17,8 +17,9 @@ class ArticlesController < ApplicationController
 
   def create
     article = Article.new(article_params)
-    if article.valid?
-      # create
+    if article.save
+      serializer = ArticleSerializer.new(article).serialized_json
+      render json: serializer, status: :created
     else
       error = ErrorSerializer.new(article).serialized_json
       render json: { errors: error }, status: :unprocessable_entity
@@ -28,8 +29,9 @@ class ArticlesController < ApplicationController
   private
 
   def article_params
-    # requireメソッドは何を返すの？
-    # params.require(:data).require(:attributes).permit(:title, :content, :slug)
-    ActionController::Parameters.new
+    # params => <ActionController::Parameters {"data"=>{"type"=>"articles", "attributes"=>
+    #  {"title"=>"", "content"=>"", "slug"=>""}}, "controller"=>"articles", "action"=>"create", "article"=>{}}
+    #  permitted: false>
+    params.require(:data).require(:attributes).permit(:title, :content, :slug)
   end
 end
