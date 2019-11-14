@@ -29,7 +29,8 @@ class ArticlesController < ApplicationController
   def update
     article = Article.find(params[:id])
     if article.update(article_params)
-      # update
+      serializer = ArticleSerializer.new(article).serialized_json
+      render json: serializer, status: :ok
     else
       error = ErrorSerializer.new(article).serialized_json
       render json: { errors: error }, status: :unprocessable_entity

@@ -153,7 +153,6 @@ RSpec.describe ArticlesController, type: :controller do
     let(:article) { create :article }
     let(:invalid_attributes) do
       {
-        'id' => article.id,
         'data' => {
           'attributes' => {
             'title' => '',
@@ -163,7 +162,7 @@ RSpec.describe ArticlesController, type: :controller do
         }
       }
     end
-    subject { patch :update, params: invalid_attributes }
+    subject { patch :update, params: invalid_attributes.merge(id: article.id) }
 
     context 'when no authorization headers provided' do
       it_behaves_like 'forbidden_request'
@@ -201,6 +200,36 @@ RSpec.describe ArticlesController, type: :controller do
               "detail" => "can't be blank"
             }
           )
+        end
+      end
+
+      context 'when success request sent' do
+        let(:valid_attributes) do
+          {
+            'data' => {
+              'attributes' => {
+                'title' => 'update title',
+                'content' => 'update content',
+                'slug' => 'update slug'
+              }
+            }
+          }
+        end
+        subject { patch :update, params: valid_attributes.merge(id: article.id) }
+
+        it 'should return 200 status code' do
+          subject
+          expect(response).to have_http_status 200
+        end
+
+        it 'should return proper json body' do
+          subject
+          expect(json_data).to include valid_attributes['data']
+        end
+
+        it 'should update article' do
+          subject
+          expect(article.reload.title).to eq valid_attributes['data']['attributes']['title']
         end
       end
     end
