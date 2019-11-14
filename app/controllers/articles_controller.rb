@@ -5,12 +5,14 @@ class ArticlesController < ApplicationController
 
   def index
     articles = Article.recent.page(params[:page]).per(params[:per_page])
-    render json: articles
+    serializer = ArticleSerializer.new(articles).serialized_json
+    render json: serializer
   end
 
   def show
     article = Article.find(params[:id])
-    render json: article, status: :ok
+    serializer = ArticleSerializer.new(article).serialized_json
+    render json: serializer, status: :ok
   end
 
   def create
@@ -18,9 +20,8 @@ class ArticlesController < ApplicationController
     if article.valid?
       # create
     else
-      render json: article, adapter: :json_api,
-             serializer: ActiveModel::Serializer::ErrorSerializer,
-             status: :unprocessable_entity
+      error = ErrorSerializer.new(article).serialized_json
+      render json: { errors: error }, status: :unprocessable_entity
     end
   end
 

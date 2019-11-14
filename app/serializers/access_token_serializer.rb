@@ -1,3 +1,8 @@
+# frozen_string_literal: true
+
 class AccessTokenSerializer < ActiveModel::Serializer
-  attributes :id, :token
+  include FastJsonapi::ObjectSerializer
+
+  set_type :access_token
+  attributes :token
 end
