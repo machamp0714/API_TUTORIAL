@@ -23,3 +23,5 @@ Lint/AmbiguousBlockAssociation:
   Enabled: false
 Style/StringLiterals:
   Enabled: false
+Layout/IndentFirstHashElement:
+  Enabled: false

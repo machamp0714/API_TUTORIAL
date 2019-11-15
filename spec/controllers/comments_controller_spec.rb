@@ -3,45 +3,67 @@
 require 'rails_helper'
 
 RSpec.describe CommentsController, type: :controller do
-  let(:valid_attributes) do
-    skip("Add a hash of attributes valid for your model")
-  end
-
-  let(:invalid_attributes) do
-    skip("Add a hash of attributes invalid for your model")
-  end
-  let(:valid_session) { {} }
+  let(:article) { create :article }
 
   describe "GET #index" do
-    let(:article) { create :article }
-
     it "returns a success response" do
-      get :index, params: { article_id: article.id }, session: valid_session
+      get :index, params: { article_id: article.id }
       expect(response).to have_http_status :ok
     end
   end
 
   describe "POST #create" do
-    context "with valid params" do
-      it "creates a new Comment" do
-        expect do
-          post :create, params: { comment: valid_attributes }, session: valid_session
-        end.to change(Comment, :count).by(1)
+    let(:valid_attributes) { { content: 'My awesome comment for article' } }
+    let(:invalid_attributes) { { content: '' } }
+
+    context 'when no authorized' do
+      subject { post :create, params: { article_id: article.id, comment: valid_attributes } }
+
+      context 'when no authorization headers provided' do
+        it_behaves_like 'forbidden_request'
       end
 
-      it "renders a JSON response with the new comment" do
-        post :create, params: { comment: valid_attributes }, session: valid_session
-        expect(response).to have_http_status(:created)
-        expect(response.content_type).to eq('application/json')
-        expect(response.location).to eq(comment_url(Comment.last))
+      context 'when invalid authorization provided' do
+        before { request.headers['authorization'] = 'invalid_token' }
+        it_behaves_like 'forbidden_request'
       end
     end
 
-    context "with invalid params" do
-      it "renders a JSON response with errors for the new comment" do
-        post :create, params: { comment: invalid_attributes }, session: valid_session
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq('application/json')
+    context 'when authorized' do
+      let(:user) { create :user }
+      let(:access_token) { user.create_access_token }
+      before { request.headers['authorization'] = "Bearer #{access_token.token}" }
+
+      context "with valid params" do
+        subject { post :create, params: { article_id: article.id, comment: valid_attributes } }
+
+        it "creates a new Comment" do
+          expect do
+            subject
+          end.to change(Comment, :count).by(1)
+        end
+
+        it "renders a JSON response with the new comment" do
+          subject
+          expect(response).to have_http_status(:created)
+          expect(response.location).to eq(article_url(article))
+        end
+
+        it 'should return proper json body' do
+          subject
+          expect(json_data['attributes']).to include(
+            'content' => 'My awesome comment for article',
+            'user_id' => user.id,
+            'article_id' => article.id
+          )
+        end
+      end
+
+      context "with invalid params" do
+        it "renders a JSON response with errors for the new comment" do
+          post :create, params: { article_id: article.id, comment: invalid_attributes }
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
       end
     end
   end
