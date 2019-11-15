@@ -2,6 +2,7 @@
 
 class ArticlesController < ApplicationController
   before_action :authorize!, only: %i[create update]
+  before_action :check_user, only: %i[update]
 
   def index
     articles = Article.recent.page(params[:page]).per(params[:per_page])
@@ -16,7 +17,7 @@ class ArticlesController < ApplicationController
   end
 
   def create
-    article = Article.new(article_params)
+    article = current_user.articles.build(article_params)
     if article.save
       serializer = ArticleSerializer.new(article).serialized_json
       render json: serializer, status: :created
@@ -44,5 +45,10 @@ class ArticlesController < ApplicationController
     #  {"title"=>"", "content"=>"", "slug"=>""}}, "controller"=>"articles", "action"=>"create", "article"=>{}}
     #  permitted: false>
     params.require(:data).require(:attributes).permit(:title, :content, :slug)
+  end
+
+  def check_user
+    article = Article.find(params[:id])
+    raise AuthorizationError if current_user.id != article.user_id
   end
 end
