@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ArticlesController < ApplicationController
-  before_action :authorize!, only: %i[create update]
+  before_action :authorize!, only: %i[create update destroy]
 
   def index
     articles = Article.recent.page(params[:page]).per(params[:per_page])
@@ -33,9 +33,17 @@ class ArticlesController < ApplicationController
     render json: serializer, status: :ok
   rescue ActiveRecord::RecordNotFound
     authorization_error
-  rescue
+  rescue StandardError
     error = ErrorSerializer.new(article).serialized_json
     render json: { errors: error }, status: :unprocessable_entity
+  end
+
+  def destroy
+    article = current_user.articles.find(params[:id])
+    article.destroy!
+    head :no_content
+  rescue StandardError
+    authorization_error
   end
 
   private
