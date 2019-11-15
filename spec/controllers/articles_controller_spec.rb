@@ -150,18 +150,9 @@ RSpec.describe ArticlesController, type: :controller do
   end
 
   describe 'PATCH #update' do
-    let(:article) { create :article }
-    let(:invalid_attributes) do
-      {
-        'data' => {
-          'attributes' => {
-            'title' => '',
-            'content' => '',
-            'slug' => ''
-          }
-        }
-      }
-    end
+    let(:user) { create :user }
+    let(:article) { create :article, user: user }
+    
     subject { patch :update, params: invalid_attributes.merge(id: article.id) }
 
     context 'when no authorization headers provided' do
@@ -174,11 +165,21 @@ RSpec.describe ArticlesController, type: :controller do
     end
 
     context 'when authorized' do
-      let(:user) { create :user }
       let(:access_token) { user.create_access_token }
       before { request.headers['authorization'] = "Bearer #{access_token.token}" }
 
       context 'when invalid parameters provided' do
+        let(:invalid_attributes) do
+          {
+            'data' => {
+              'attributes' => {
+                'title' => '',
+                'content' => '',
+                'slug' => ''
+              }
+            }
+          }
+        end
         it 'should return 422 status code' do
           subject
           expect(response).to have_http_status :unprocessable_entity
@@ -201,6 +202,14 @@ RSpec.describe ArticlesController, type: :controller do
             }
           )
         end
+      end
+
+      context 'when update not owned article' do
+        let(:other_user) { create :user }
+        let(:other_article) {  create :article, user: other_user }
+        subject { patch :update, params: { id: other_article.id } }
+
+        it_behaves_like 'forbidden_request'
       end
 
       context 'when success request sent' do
