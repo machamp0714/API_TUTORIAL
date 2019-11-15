@@ -2,7 +2,6 @@
 
 class ArticlesController < ApplicationController
   before_action :authorize!, only: %i[create update]
-  before_action :check_user, only: %i[update]
 
   def index
     articles = Article.recent.page(params[:page]).per(params[:per_page])
@@ -28,14 +27,15 @@ class ArticlesController < ApplicationController
   end
 
   def update
-    article = Article.find(params[:id])
-    if article.update(article_params)
-      serializer = ArticleSerializer.new(article).serialized_json
-      render json: serializer, status: :ok
-    else
-      error = ErrorSerializer.new(article).serialized_json
-      render json: { errors: error }, status: :unprocessable_entity
-    end
+    article = current_user.articles.find(params[:id])
+    article.update!(article_params)
+    serializer = ArticleSerializer.new(article).serialized_json
+    render json: serializer, status: :ok
+  rescue ActiveRecord::RecordNotFound
+    authorization_error
+  rescue
+    error = ErrorSerializer.new(article).serialized_json
+    render json: { errors: error }, status: :unprocessable_entity
   end
 
   private
@@ -45,10 +45,5 @@ class ArticlesController < ApplicationController
     #  {"title"=>"", "content"=>"", "slug"=>""}}, "controller"=>"articles", "action"=>"create", "article"=>{}}
     #  permitted: false>
     params.require(:data).require(:attributes).permit(:title, :content, :slug)
-  end
-
-  def check_user
-    article = Article.find(params[:id])
-    raise AuthorizationError if current_user.id != article.user_id
   end
 end
