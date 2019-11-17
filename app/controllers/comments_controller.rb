@@ -4,9 +4,10 @@ class CommentsController < ApplicationController
   before_action :authorize!, only: %i[create]
 
   def index
-    @comments = Comment.all
-
-    render json: @comments
+    article = Article.find(params[:article_id])
+    comments = article.comments.page(params[:page]).per(params[:per_page])
+    serializer = CommentSerializer.new(comments).serialized_json
+    render json: serializer
   end
 
   def create
