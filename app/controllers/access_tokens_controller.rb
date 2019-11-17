@@ -6,8 +6,7 @@ class AccessTokensController < ApplicationController
   def create
     authenticator = UserAuthenticator.new(params[:code])
     authenticator.perform
-    serializer = AccessTokenSerializer.new(authenticator.access_token).serialized_json
-    render json: serializer, status: :created
+    render json: authenticator.access_token, status: :created
   end
 
   def destroy

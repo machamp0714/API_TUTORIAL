@@ -5,21 +5,19 @@ class ArticlesController < ApplicationController
 
   def index
     articles = Article.recent.page(params[:page]).per(params[:per_page])
-    serializer = ArticleSerializer.new(articles).serialized_json
-    render json: serializer, status: :ok
+    render json: articles, status: :ok
   end
 
   def show
     article = Article.find(params[:id])
-    serializer = ArticleSerializer.new(article, include: %i[comments user]).serialized_json
-    render json: serializer, status: :ok
+
+    render json: article, status: :ok
   end
 
   def create
     article = current_user.articles.build(article_params)
     if article.save
-      serializer = ArticleSerializer.new(article).serialized_json
-      render json: serializer, status: :created
+      render json: article, status: :created
     else
       error = ErrorSerializer.new(article).serialized_json
       render json: { errors: error }, status: :unprocessable_entity
@@ -29,8 +27,7 @@ class ArticlesController < ApplicationController
   def update
     article = current_user.articles.find(params[:id])
     article.update!(article_params)
-    serializer = ArticleSerializer.new(article).serialized_json
-    render json: serializer, status: :ok
+    render json: article, status: :ok
   rescue ActiveRecord::RecordNotFound
     authorization_error
   rescue StandardError

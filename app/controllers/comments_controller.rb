@@ -6,8 +6,7 @@ class CommentsController < ApplicationController
   def index
     article = Article.find(params[:article_id])
     comments = article.comments.page(params[:page]).per(params[:per_page])
-    serializer = CommentSerializer.new(comments).serialized_json
-    render json: serializer
+    render json: comments, status: :ok
   end
 
   def create
@@ -15,8 +14,7 @@ class CommentsController < ApplicationController
     comment = article.comments.build(comment_params.merge(user_id: current_user.id))
 
     if comment.save
-      serializer = CommentSerializer.new(comment).serialized_json
-      render json: serializer, status: :created, location: article
+      render json: comment, status: :created, location: article
     else
       error = ErrorSerializer.new(comment).serialized_json
       render json: { errors: error }, status: :unprocessable_entity

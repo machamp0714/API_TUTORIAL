@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
-class CommentSerializer
-  include FastJsonapi::ObjectSerializer
-
-  set_type :comments
-  attributes :content
+class CommentSerializer < ActiveModel::Serializer
+  attributes :id, :content
 
   belongs_to :article
   belongs_to :user

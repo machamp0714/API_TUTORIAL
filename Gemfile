@@ -9,7 +9,6 @@ gem 'rails', '~> 6.0.0'
 gem 'mysql2', '>= 0.4.4'
 gem 'puma', '~> 3.11'
 gem 'active_model_serializers'
-gem 'fast_jsonapi'
 gem 'kaminari'
 gem 'octokit'
 gem 'bootsnap', '>= 1.4.2', require: false
