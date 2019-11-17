@@ -2,9 +2,9 @@
 
 require 'rails_helper'
 
-describe UserAuthenticator do
+describe UserAuthenticator::Oauth do
   describe '#perform' do
-    let(:authenticator) { described_class.new(code: 'sample_code') }
+    let(:authenticator) { described_class.new('sample_code') }
     subject { authenticator.perform }
 
     context 'when code is incorrect' do

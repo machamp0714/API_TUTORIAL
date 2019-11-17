@@ -11,7 +11,7 @@ class UserAuthenticator
       Oauth.new(code)
     else
       Standard.new(login: nil, password: nil)
-                     end
+    end
   end
 
   def perform
