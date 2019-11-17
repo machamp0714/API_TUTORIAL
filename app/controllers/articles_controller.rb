@@ -11,7 +11,7 @@ class ArticlesController < ApplicationController
 
   def show
     article = Article.find(params[:id])
-    serializer = ArticleSerializer.new(article).serialized_json
+    serializer = ArticleSerializer.new(article, include: %i[comments user]).serialized_json
     render json: serializer, status: :ok
   end
 

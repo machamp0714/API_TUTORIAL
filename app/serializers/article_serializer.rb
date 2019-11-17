@@ -5,4 +5,7 @@ class ArticleSerializer
 
   set_type :articles
   attributes :title, :content, :slug
+
+  belongs_to :user
+  has_many :comments
 end
