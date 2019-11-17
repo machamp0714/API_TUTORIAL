@@ -4,16 +4,16 @@ require 'rails_helper'
 
 RSpec.describe 'AccessTokens', type: :request do
   describe '#create' do
-    context 'when no code provided' do
+    context 'when no auth_data provided' do
       subject { post login_path }
 
-      it_behaves_like 'authorization_error'
+      it_behaves_like 'unauthorized_standard_request'
     end
 
     context 'when invalid code provided' do
       subject { post login_path, params: { code: 'invalid code' } }
 
-      it_behaves_like 'authorization_error'
+      it_behaves_like 'unauthorized_oauth_request'
     end
 
     context 'when valid requests' do
