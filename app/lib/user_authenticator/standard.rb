@@ -3,7 +3,7 @@
 class UserAuthenticator::Standard < UserAuthenticator
   class AuthenticationError::StandardError < StandardError; end
 
-  def initialize(login: nil, password: nil); end
+  def initialize(login, password); end
 
   def perform
     raise AuthenticationError
