@@ -7,7 +7,7 @@ RSpec.describe 'AccessTokens', type: :request do
     context 'when no auth_data provided' do
       subject { post login_path }
 
-      it_behaves_like 'unauthorized_oauth_request'
+      it_behaves_like 'unauthorized_standard_request'
     end
 
     context 'when invalid code provided' do
@@ -65,7 +65,7 @@ RSpec.describe 'AccessTokens', type: :request do
         allow_any_instance_of(Octokit::Client).to receive(:user).and_return(user_data)
       end
 
-      subject { post login_path, params: { data: { attributes: { code: 'valid_code' } } } }
+      subject { post login_path, params: { code: 'validaccesstoken' } }
 
       it 'should return 201 code' do
         subject
