@@ -3,9 +3,24 @@
 class UserAuthenticator::Standard < UserAuthenticator
   class AuthenticationError::StandardError < StandardError; end
 
-  def initialize(login, password); end
+  attr_reader :user
+
+  def initialize(login, password)
+    @login = login
+    @password = password
+  end
 
   def perform
-    raise AuthenticationError
+    user = User.find_by(login: login)
+
+    if user&.authenticate(password)
+      @user = user
+    else
+      raise AuthenticationError
+    end
   end
+
+  private
+
+  attr_reader :login, :password
 end

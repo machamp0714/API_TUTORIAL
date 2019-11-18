@@ -8,5 +8,6 @@ FactoryBot.define do
     url { 'http://github/url' }
     avatar_url { 'http://github/avatar_url' }
     provider { 'github' }
+    password { 'password' }
   end
 end

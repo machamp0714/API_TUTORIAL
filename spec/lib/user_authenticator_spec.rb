@@ -24,6 +24,14 @@ describe UserAuthenticator do
         expect(authenticator_class).to receive(:new).with('jsmith', 'password')
         authenticator
       end
+
+      let(:user) { create :user, login: 'jsmith', password: 'password' }
+      before { user }
+
+      it 'should create access_token and set token' do
+        expect { authenticator.perform }.to change { AccessToken.count }.by(1)
+        expect(authenticator.access_token).to be_present
+      end
     end
   end
 end

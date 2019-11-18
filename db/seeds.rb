@@ -6,7 +6,8 @@ user = User.create(
   avatar_url: 'http://sample/avatar',
   name: 'sample_name',
   email: 'sample@gmail.com',
-  provider: 'github'
+  provider: 'github',
+  password: 'password'
 )
 
 other_user = User.create(
@@ -15,7 +16,8 @@ other_user = User.create(
   avatar_url: 'http://sample2/avatar',
   name: 'sample2_name',
   email: 'sample2@gmail.com',
-  provider: 'github'
+  provider: 'github',
+  password: 'password'
 )
 
 Article.create([
