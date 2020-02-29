@@ -7,7 +7,7 @@ ruby '2.6.5'
 
 gem 'rails', '~> 6.0.0'
 gem 'mysql2', '>= 0.4.4'
-gem 'puma', '~> 3.11'
+gem 'puma', '~> 3.12'
 gem 'active_model_serializers'
 gem 'kaminari'
 gem 'octokit'
